@@ -36,7 +36,7 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(res => res.data, err => {
   // 401状态码，进入该函数
   // 跳转到登录页
-  if (err.response && err.response.state === 401) {
+  if (err.response && err.response.status === 401) {
     // 1.清空无效信息
     // 2.跳转到登录页面
     // 3.跳转需要传当前路由地址给登录页(方便登陆之后跳转回来)
