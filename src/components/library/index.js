@@ -9,6 +9,7 @@ import defaultImg from '@/assets/images/200.png'
 // import XtxMore from './xtx-more.vue'
 // import XtxBread from './xtx-bread.vue'
 // import XtxBreadItem from './xtx-bread-item.vue'
+import Message from './Message'
 
 // 导入library文件夹下的所有组件
 // 批量导入需要使用一个函数 require.context(dir,deep,matching)
@@ -33,6 +34,9 @@ export default {
     })
     // 定义指令
     defineDirective(app)
+
+    // 定义一个原型函数
+    app.config.globalProperties.$message = Message// 原型函数
   }
 }
 
