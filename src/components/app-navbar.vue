@@ -4,7 +4,10 @@
       <ul>
         <template v-if="profile.token">
           <li><a href="javascript:;"><i class="iconfont icon-user"></i>{{profile.account}}</a></li>
-          <li><a href="javascript:;">退出登录</a></li>
+          <li><a
+              href="javascript:;"
+              @click="lgout"
+            >退出登录</a></li>
         </template>
         <template v-else>
           <li>
@@ -24,17 +27,24 @@
 <script>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 export default {
 
   name: 'AppTopnav',
   setup () {
+    const router = useRouter()
     // 获取用户信息才能控制切换导航菜单
     const store = useStore()
     // 使用vuex的state需要设置计算属性
     const profile = computed(() => {
       return store.state.user.profile
     })
-    return { profile }
+    // 退出登录
+    const lgout = () => {
+      store.commit('user/setUser', {})
+      router.push('/login')
+    }
+    return { profile, lgout }
   }
 }
 </script>

@@ -39,6 +39,8 @@ import LoginFooter from './components/login-footer'
 import LoginForm from './components/login-form'
 
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Login',
@@ -49,6 +51,10 @@ export default {
   },
   setup () {
     const activeName = ref('account')
+    // 存入回调地址
+    const store = useStore()
+    const route = useRoute()
+    store.commit('user/setRedirectUrl', route.query.redirectUrl || '/')
     return { activeName }
   }
 }
