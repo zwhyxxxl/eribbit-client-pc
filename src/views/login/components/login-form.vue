@@ -220,11 +220,13 @@ export default {
           }
           const { id, account, nickname, avatar, token, mobile } = data.result
           store.commit('user/setUser', { id, account, nickname, avatar, token, mobile })
-          // 进行跳转
-          console.log(route.query.redirectUrl)
-          router.push(route.query.redirectUrl || '/')
-          // 消息提示
-          Message({ type: 'success', text: '登陆成功' })
+          // console.log(route.query.redirectUrl)
+          store.dispatch('cart/mergeLocalCart').then(() => {
+            // 进行跳转
+            router.push(route.query.redirectUrl || '/')
+            // 消息提示
+            Message({ type: 'success', text: '登陆成功' })
+          })
         } catch (e) {
           Message({ type: 'error', text: e.response.data.message || '登录失败' })
         }

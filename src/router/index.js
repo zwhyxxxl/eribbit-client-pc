@@ -6,6 +6,7 @@ const SubCategory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login/index')
 const LoginCallback = () => import('@/views/login/callback')
+const Cart = () => import('@/views/cart/index.vue')
 const routes = [
   // 一级路由布局容器
   {
@@ -27,6 +28,10 @@ const routes = [
       {
         path: '/product/:id',
         component: Goods
+      },
+      {
+        path: '/cart',
+        component: Cart
       }
 
     ]
@@ -39,6 +44,7 @@ const routes = [
     path: '/login/callback',
     component: LoginCallback
   }
+
 ]
 
 // vue2.0 new VueRouter({})

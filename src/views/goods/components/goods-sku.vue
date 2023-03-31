@@ -150,7 +150,6 @@ export default {
           oldPrice: sku.oldPrice,
           inventory: sku.inventory,
           specsText: sku.specs.reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '').replace(' ', '')// 属性名：属性值...这样的字符串 颜色：黑色 产地：日本
-
         })
       } else {
         // 加入购物车时父组件需要判断规格是否选择完

@@ -32,6 +32,7 @@
             size='middle'
             type='primary'
             style="margin-top:20px;"
+            @click="insertCart"
           >加入购物车</XtxButton>
         </div>
       </div>
@@ -67,6 +68,8 @@ import GoodsWarn from './components/goods-warn.vue'
 import { findGoods } from '@/api/product'
 import { useRoute } from 'vue-router'
 import { nextTick, provide, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import Message from '@/components/library/Message'
 export default {
   name: 'XtxGoodsPage',
   components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku, GoodsTabs, GoodsHot, GoodsWarn },
@@ -77,16 +80,44 @@ export default {
     provide('goods', goods)
     // console.log(goods)
     // console.log(goods)
+    const currSku = ref(null)
     const changeSku = (sku) => {
       if (sku.skuId) {
         goods.value.price = sku.price
         goods.value.oldPrice = sku.oldPrice
         goods.value.inventory = sku.inventory
       }
+      // 记录选择后的sku 可能有数据，也可能是空对象
+      currSku.value = sku
     }
     // 选择的数量
     const count = ref(1)
-    return { goods, changeSku, count }
+    // 加入购物车
+    const store = useStore()
+    const insertCart = () => {
+      // 约定的字段必须和后端保持一致
+      // 本地：id skuId name picture price nowPrice count attrsText selected stock isEffective
+      if (currSku.value && currSku.value.skuId) {
+        store.dispatch('cart/insertCart', {
+          skuId: currSku.value.skuId,
+          attrsText: currSku.value.specsText,
+          stock: currSku.value.inventory,
+          id: goods.value.id,
+          picture: goods.value.mainPictures[0],
+          price: goods.value.price,
+          name: goods.value.name,
+          nowPrice: goods.value.price,
+          selected: true,
+          count: count.value,
+          isEffective: true
+        }).then(() => {
+          Message({ type: 'success', text: '加入购物车成功' })
+        })
+      } else {
+        Message({ text: '请选择完整规格' })
+      }
+    }
+    return { goods, changeSku, count, insertCart }
   }
 }
 // 获取商品详情
@@ -105,6 +136,7 @@ const useGoods = () => {
       })
     }
   }, { immediate: true })
+
   return goods
 }
 </script>

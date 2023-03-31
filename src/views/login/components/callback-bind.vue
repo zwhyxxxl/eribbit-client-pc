@@ -150,10 +150,13 @@ export default {
           // 存储用户信息
           const { id, account, nickname, avatar, token, mobile } = data.result
           store.commit('user/setUser', { id, account, nickname, avatar, token, mobile })
-          // 跳转到来源页或者首页
-          router.push(store.state.user.redirectUrl)
-          // 成功提示
-          Message({ type: 'success', text: '绑定成功' })
+
+          store.dispatch('cart/mergeLocalCart').then(() => {
+            // 跳转到来源页或者首页
+            router.push(store.state.user.redirectUrl)
+            // 成功提示
+            Message({ type: 'success', text: '绑定成功' })
+          })
         }).catch(e => {
           Message({ type: 'error', text: '绑定失败' })
         })
