@@ -1,4 +1,4 @@
-import { getNewCartGoods, mergeLocalCart } from '@/api/cart'
+import { getNewCartGoods, mergeLocalCart, findCartList, insertCart, deleteCart, updateCart, checkAllCart } from '@/api/cart'
 // 购物车状态
 
 // 购物车模块
@@ -81,7 +81,7 @@ export default {
     },
     // 设置购物车列表
     setCartList (state, payload) {
-      console.log('设置购物车')
+      // console.log('设置购物车')
       state.list = payload
     }
   },
@@ -91,6 +91,12 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 已登录
+          insertCart({ skuId: payload.skuId, count: payload.count }).then(() => {
+            return findCartList()
+          }).then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 未登录
           ctx.commit('insertCart', payload)
@@ -103,6 +109,10 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 登录
+          findCartList().then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 未登录
           // 同时发送请求
@@ -128,6 +138,12 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 登录
+          deleteCart([payload]).then(() => {
+            return findCartList()
+          }).then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 未登录
           ctx.commit('deleteCart', payload)
@@ -141,6 +157,12 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 已登录
+          updateCart(payload).then(() => {
+            return findCartList()
+          }).then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 未登录
           ctx.commit('updateCart', payload)
@@ -154,6 +176,13 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 登录 TODO
+          const ids = ctx.getters.validList.map(item => item.skuId)
+          checkAllCart({ ids, selected }).then(() => {
+            return findCartList()
+          }).then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 本地
           // 1. 获取有效的商品列表，遍历的去调用修改mutations即可
@@ -169,6 +198,15 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 登录 TODO
+          const ids = ctx.getters[isClear ? 'invalidList' : 'selectedList'].map(item => {
+            return item.skuId
+          })
+          deleteCart(ids).then(() => {
+            return findCartList()
+          }).then(data => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 本地
           ctx.getters[isClear ? 'invalidList' : 'selectedList'].forEach(item => {
@@ -183,6 +221,20 @@ export default {
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.profile.token) {
           // 登录 TODO
+          // 登录 TODO
+          // 1. 获取原先商品的数量
+          // 2. 删除原先商品
+          // 3. 获取修改的skuId 和 原先商品数量 做一个加入购物车操作
+          // 4. 更新列表
+          const oldGoods = ctx.state.list.find(item => item.skuId === oldSkuId)
+          deleteCart([oldSkuId]).then(() => {
+            return insertCart({ skuId: newSku.skuId, count: oldGoods.count })
+          }).then(() => {
+            return findCartList()
+          }).then((data) => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 本地
           // 1.找出旧的商品信息

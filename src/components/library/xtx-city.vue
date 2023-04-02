@@ -11,7 +11,7 @@
       <span
         class="placeholder"
         v-if="!fullLocation"
-      >请选择配送地址</span>
+      >{{placeholder}}</span>
       <span
         v-else
         class="value"
@@ -48,6 +48,10 @@ export default {
     fullLocation: {
       type: String,
       default: ''
+    },
+    placeholder: {
+      type: String,
+      default: '请选择配送地址'
     }
   },
   setup (props, { emit }) {
