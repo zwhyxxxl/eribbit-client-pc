@@ -13,7 +13,8 @@
                 <XtxCheckbox
                   @change="checkAll"
                   :modelValue="$store.getters['cart/isCheckAll']"
-                >全选</XtxCheckbox>
+                  >全选</XtxCheckbox
+                >
               </th>
               <th width="400">商品信息</th>
               <th width="220">单价</th>
@@ -23,7 +24,7 @@
             </tr>
           </thead>
           <!-- 有效商品 -->
-          <tr v-if="$store.getters['cart/validList'].length===0">
+          <tr v-if="$store.getters['cart/validList'].length === 0">
             <td colspan="6">
               <CartNone />
             </td>
@@ -35,58 +36,64 @@
             >
               <td>
                 <XtxCheckbox
-                  :modelValue='goods.selected'
-                  @change="$event=>checkOne(goods.skuId,$event)"
+                  :modelValue="goods.selected"
+                  @change="($event) => checkOne(goods.skuId, $event)"
                 />
               </td>
               <td>
                 <div class="goods">
-                  <RouterLink :to="`/product/${goods.id}`"><img
-                      :src="goods.picture"
-                      alt=""
-                    ></RouterLink>
+                  <RouterLink :to="`/product/${goods.id}`"
+                    ><img :src="goods.picture" alt=""
+                  /></RouterLink>
                   <div>
-                    <p class="name ellipsis">{{goods.name}}</p>
+                    <p class="name ellipsis">{{ goods.name }}</p>
                     <!-- 选择规格组件 -->
                     <!-- <p class="attr">{{goods.attrsText}}</p> -->
                     <CartSku
-                      @change="$event=>updateCartSku(goods.skuId,$event)"
+                      @change="($event) => updateCartSku(goods.skuId, $event)"
                       :skuId="goods.skuId"
-                      :attrsText='goods.attrsText'
+                      :attrsText="goods.attrsText"
                     ></CartSku>
                   </div>
                 </div>
               </td>
               <td class="tc">
-                <p>&yen;{{goods.nowPrice}}</p>
-                <p v-if="goods.price-goods.nowPrice>0">
+                <p>&yen;{{ goods.nowPrice }}</p>
+                <p v-if="goods.price - goods.nowPrice > 0">
                   比加入时降价
-                  <span class="red">&yen;{{goods.price-goods.nowPrice}}</span>
+                  <span class="red"
+                    >&yen;{{ goods.price - goods.nowPrice }}</span
+                  >
                 </p>
               </td>
               <td class="tc">
                 <XtxNumbox
-                  @change="$event=>changeCount(goods.skuId,$event)"
-                  :max='goods.stock'
+                  @change="($event) => changeCount(goods.skuId, $event)"
+                  :max="goods.stock"
                   :modelValue="goods.count"
                 />
               </td>
               <td class="tc">
-                <p class="f16 red">&yen;{{goods.nowPrice*100*goods.count/100}}</p>
+                <p class="f16 red">
+                  &yen;{{ (goods.nowPrice * 100 * goods.count) / 100 }}
+                </p>
               </td>
               <td class="tc">
                 <p><a href="javascript:;">移入收藏夹</a></p>
-                <p><a
+                <p>
+                  <a
                     class="green"
                     href="javascript:;"
                     @click="deleteCart(goods.skuId)"
-                  >删除</a></p>
+                    >删除</a
+                  >
+                </p>
                 <p><a href="javascript:;">找相似</a></p>
               </td>
             </tr>
           </tbody>
           <!-- 无效商品 -->
-          <tbody v-if="$store.getters['cart/invalidList'].length>0">
+          <tbody v-if="$store.getters['cart/invalidList'].length > 0">
             <tr>
               <td colspan="6">
                 <h3 class="tit">失效商品</h3>
@@ -97,34 +104,28 @@
               :key="item.skuId"
             >
               <td>
-                <XtxCheckbox style="color:#eee;" />
+                <XtxCheckbox style="color: #eee" />
               </td>
               <td>
                 <div class="goods">
                   <RouterLink :to="`/product/${item.id}`">
-                    <img
-                      :src="item.picture"
-                      alt=""
-                    >
+                    <img :src="item.picture" alt="" />
                   </RouterLink>
                   <div>
-                    <p class="name ellipsis">{{item.name}}</p>
-                    <p class="attr">{{item.attrsText}}</p>
+                    <p class="name ellipsis">{{ item.name }}</p>
+                    <p class="attr">{{ item.attrsText }}</p>
                   </div>
                 </div>
               </td>
               <td class="tc">
-                <p>&yen;{{item.nowPrice}}</p>
+                <p>&yen;{{ item.nowPrice }}</p>
               </td>
-              <td class="tc">{{item.count}}</td>
+              <td class="tc">{{ item.count }}</td>
               <td class="tc">
-                <p>&yen;{{item.nowPrice*100*item.count/100}}</p>
+                <p>&yen;{{ (item.nowPrice * 100 * item.count) / 100 }}</p>
               </td>
               <td class="tc">
-                <p><a
-                    class="green"
-                    href="javascript:;"
-                  >删除</a></p>
+                <p><a class="green" href="javascript:;">删除</a></p>
                 <p><a href="javascript:;">找相似</a></p>
               </td>
             </tr>
@@ -138,24 +139,19 @@
           <XtxCheckbox
             @change="checkAll"
             :modelValue="$store.getters['cart/isCheckAll']"
-          >全选</XtxCheckbox>
-          <a
-            href="javascript:;"
-            @click="batchDeleteCart(false)"
-          >删除商品</a>
+            >全选</XtxCheckbox
+          >
+          <a href="javascript:;" @click="batchDeleteCart(false)">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
-          <a
-            href="javascript:;"
-            @click="batchDeleteCart(true)"
-          >清空失效商品</a>
+          <a href="javascript:;" @click="batchDeleteCart(true)">清空失效商品</a>
         </div>
         <div class="total">
-          共 {{$store.getters['cart/validTotal']}} 件商品，已选择 {{$store.getters['cart/selectedTotal']}} 件，商品合计：
-          <span class="red">¥{{$store.getters['cart/selectedAmount']}}</span>
-          <XtxButton
-            type="primary"
-            @click="goCheckout "
-          >下单结算</XtxButton>
+          共 {{ $store.getters['cart/validTotal'] }} 件商品，已选择
+          {{ $store.getters['cart/selectedTotal'] }} 件，商品合计：
+          <span class="red"
+            >¥{{ $store.getters['cart/selectedAmount'].toFixed(2) }}</span
+          >
+          <XtxButton type="primary" @click="goCheckout">下单结算</XtxButton>
         </div>
       </div>
       <!-- 猜你喜欢 -->

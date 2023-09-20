@@ -1,100 +1,52 @@
 <template>
   <div class="goods-comment">
-    <div
-      class="head"
-      v-if="commentInfo"
-    >
+    <div class="head" v-if="commentInfo">
       <div class="data">
-        <p><span>{{commentInfo.salesCount}}</span><span>人购买</span></p>
-        <p><span>{{commentInfo.praisePercent}}</span><span>好评率</span></p>
+        <p>
+          <span>{{ commentInfo.salesCount }}</span><span>人购买</span>
+        </p>
+        <p>
+          <span>{{ commentInfo.praisePercent }}</span><span>好评率</span>
+        </p>
       </div>
       <div class="tags">
         <div class="dt">大家都在说：</div>
         <div class="dd">
-          <a
-            href="javascript:;"
-            :class="{active:currentTagIndex===i}"
-            v-for="(item,i) in commentInfo.tags"
-            :key='i'
-            @click="changeTag(i,item)"
-          >{{item.title}}({{item.tagCount}})</a>
-
+          <a href="javascript:;" :class="{ active: currentTagIndex === i }" v-for="(item, i) in commentInfo.tags" :key="i" @click="changeTag(i, item)">{{ item.title }}({{ item.tagCount }})</a>
         </div>
       </div>
     </div>
-    <div
-      class="sort"
-      v-if="commentInfo"
-    >
+    <div class="sort" v-if="commentInfo">
       <span>排序：</span>
-      <a
-        href="javascript:;"
-        @click="changeSort(null)"
-        :class="{active:reqParams.sortField===null}"
-      >默认</a>
-      <a
-        @click="changeSort(createTime)"
-        :class="{active:reqParams.sortField==='createTime'}"
-        href="javascript:;"
-      >最新</a>
-      <a
-        @click="changeSort(praiseCount)"
-        :class="{active:reqParams.sortField==='praiseCount'}"
-        href="javascript:;"
-      >最热</a>
+      <a href="javascript:;" @click="changeSort(null)" :class="{ active: reqParams.sortField === null }">默认</a>
+      <a @click="changeSort(createTime)" :class="{ active: reqParams.sortField === 'createTime' }" href="javascript:;">最新</a>
+      <a @click="changeSort(praiseCount)" :class="{ active: reqParams.sortField === 'praiseCount' }" href="javascript:;">最热</a>
     </div>
     <!-- 列表 -->
-    <div
-      class="list"
-      v-if="commentList"
-    >
-      <div
-        class="item"
-        v-for="item in commentList"
-        :key='item.id'
-      >
+    <div class="list" v-if="commentList">
+      <div class="item" v-for="item in commentList" :key="item.id">
         <div class="user">
-          <img
-            :src="item.member.avatar"
-            alt=""
-          >
-          <span>{{formatNickname(item.member.nickname)}}</span>
+          <img :src="item.member.avatar" alt="" />
+          <span>{{ formatNickname(item.member.nickname) }}</span>
         </div>
         <div class="body">
           <div class="score">
-            <i
-              v-for="i in item.score"
-              :key='i+"s"'
-              class="iconfont icon-wjx01"
-            ></i>
+            <i v-for="i in item.score" :key="i + 's'" class="iconfont icon-wjx01"></i>
 
-            <i
-              v-for="i in 5-item.score"
-              :key="i+'k'"
-              class="iconfont icon-wjx02"
-            ></i>
-            <span class="attr">{{formatSpecs(item.orderInfo.specs)}}</span>
+            <i v-for="i in 5 - item.score" :key="i + 'k'" class="iconfont icon-wjx02"></i>
+            <span class="attr">{{ formatSpecs(item.orderInfo.specs) }}</span>
           </div>
-          <div class="text">{{item.content}}</div>
-          <GoodsCommentImage
-            v-if="item.pictures.length"
-            :pictures="item.pictures"
-          />
+          <div class="text">{{ item.content }}</div>
+          <GoodsCommentImage v-if="item.pictures.length" :pictures="item.pictures" />
           <div class="time">
-            <span>{{item.orderInfo.createTime}}</span>
-            <span class="zan"><i class="iconfont icon-dianzan"></i>{{item.praiseCount}}</span>
+            <span>{{ item.orderInfo.createTime }}</span>
+            <span class="zan"><i class="iconfont icon-dianzan"></i>{{ item.praiseCount }}</span>
           </div>
         </div>
       </div>
     </div>
     <!-- 分页组件 -->
-    <XtxPagination
-      v-if="total"
-      :total='total'
-      :pageSize='reqParams.pageSize'
-      :currentPage='reqParams.page'
-      @currentChange='changePagerFn'
-    ></XtxPagination>
+    <XtxPagination v-if="total" :total="total" :pageSize="reqParams.pageSize" :currentPage="reqParams.page" @currentChange="changePagerFn"></XtxPagination>
   </div>
 </template>
 <script>
@@ -109,10 +61,18 @@ export default {
   setup () {
     const commentInfo = ref(null)
     const goods = inject('goods')
-    findCommentInfoByGoods(goods.value.id).then(data => {
+    findCommentInfoByGoods(goods.value.id).then((data) => {
       // 设置数据之前，在tag数组前追加 ‘有图’和‘全部评价’
-      data.result.tags.unshift({ title: '有图', type: 'img', tagCount: data.result.hasPictureCount })
-      data.result.tags.unshift({ title: '全部评价', type: 'all', tagCount: data.result.evaluateCount })
+      data.result.tags.unshift({
+        title: '有图',
+        type: 'img',
+        tagCount: data.result.hasPictureCount
+      })
+      data.result.tags.unshift({
+        title: '全部评价',
+        type: 'all',
+        tagCount: data.result.evaluateCount
+      })
       commentInfo.value = data.result
     })
     // 激活tag
@@ -153,12 +113,16 @@ export default {
     const commentList = ref()
     const total = ref()
     // 初始化需要发请求，筛选条件发生改变发请求
-    watch(reqParams, () => {
-      findGoodsCommentList(goods.value.id, reqParams).then(data => {
-        commentList.value = data.result.items
-        total.value = data.result.counts
-      })
-    }, { immediate: true })
+    watch(
+      reqParams,
+      () => {
+        findGoodsCommentList(goods.value.id, reqParams).then((data) => {
+          commentList.value = data.result.items
+          total.value = data.result.counts
+        })
+      },
+      { immediate: true }
+    )
 
     // 定义转换数据的函数 对应vue2的过滤器
     // 定义转换数据的函数（对应vue2.0的过滤器）
@@ -172,7 +136,18 @@ export default {
     const changePagerFn = (newPage) => {
       reqParams.page = newPage
     }
-    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickname, total, changePagerFn }
+    return {
+      commentInfo,
+      currentTagIndex,
+      changeTag,
+      reqParams,
+      commentList,
+      changeSort,
+      formatSpecs,
+      formatNickname,
+      total,
+      changePagerFn
+    }
   }
 }
 </script>

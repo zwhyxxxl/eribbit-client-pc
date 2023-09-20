@@ -3,7 +3,9 @@
     <div class="container">
       <ul>
         <template v-if="profile.token">
-          <li><a href="javascript:;"><i class="iconfont icon-user"></i>{{profile.account}}</a></li>
+          <li>
+            <RouterLink to="/member"><i class="iconfont icon-user"></i>{{profile.account}}</RouterLink>
+          </li>
           <li><a
               href="javascript:;"
               @click="lgout"

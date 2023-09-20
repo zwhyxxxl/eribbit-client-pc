@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="xtx-pay-checkout-page"
-    v-if="order"
-  >
+  <div class="xtx-pay-checkout-page" v-if="order">
     <div class="container">
       <XtxBread>
         <XtxBreadItem to="/">首页</XtxBreadItem>
@@ -13,10 +10,7 @@
         <!-- 收货地址 -->
         <h3 class="box-title">收货地址</h3>
         <div class="box-body">
-          <CheckoutAddress
-            @change="changeAdress"
-            :list="order.userAddresses"
-          />
+          <CheckoutAddress @change="changeAdress" :list="order.userAddresses" />
         </div>
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
@@ -32,29 +26,20 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="item in order.goods"
-                :key="item.id"
-              >
+              <tr v-for="item in order.goods" :key="item.id">
                 <td>
-                  <a
-                    href="javascript:;"
-                    class="info"
-                  >
-                    <img
-                      :src="item.picture"
-                      alt=""
-                    >
+                  <a href="javascript:;" class="info">
+                    <img :src="item.picture" alt="" />
                     <div class="right">
-                      <p>{{item.name}}</p>
-                      <p>{{item.attrsText}}</p>
+                      <p>{{ item.name }}</p>
+                      <p>{{ item.attrsText }}</p>
                     </div>
                   </a>
                 </td>
-                <td>&yen;{{item.payPrice}}</td>
-                <td>{{item.count}}</td>
-                <td>&yen;{{item.totalPrice}}</td>
-                <td>&yen;{{item.totalPayPrice}}</td>
+                <td>&yen;{{ item.payPrice }}</td>
+                <td>{{ item.count }}</td>
+                <td>&yen;{{ item.totalPrice }}</td>
+                <td>&yen;{{ item.totalPayPrice }}</td>
               </tr>
             </tbody>
           </table>
@@ -62,31 +47,18 @@
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
-          <a
-            class="my-btn active"
-            href="javascript:;"
-          >不限送货时间：周一至周日</a>
-          <a
-            class="my-btn"
-            href="javascript:;"
-          >工作日送货：周一至周五</a>
-          <a
-            class="my-btn"
-            href="javascript:;"
-          >双休日、假日送货：周六至周日</a>
+          <a class="my-btn active" href="javascript:;"
+            >不限送货时间：周一至周日</a
+          >
+          <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
+          <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
         </div>
         <!-- 支付方式 -->
         <h3 class="box-title">支付方式</h3>
         <div class="box-body">
-          <a
-            class="my-btn active"
-            href="javascript:;"
-          >在线支付</a>
-          <a
-            class="my-btn"
-            href="javascript:;"
-          >货到付款</a>
-          <span style="color:#999">货到付款需付5元手续费</span>
+          <a class="my-btn active" href="javascript:;">在线支付</a>
+          <a class="my-btn" href="javascript:;">货到付款</a>
+          <span style="color: #999">货到付款需付5元手续费</span>
         </div>
         <!-- 金额明细 -->
         <h3 class="box-title">金额明细</h3>
@@ -94,28 +66,25 @@
           <div class="total">
             <dl>
               <dt>商品件数：</dt>
-              <dd>{{order.summary.goodsCount}}件</dd>
+              <dd>{{ order.summary.goodsCount }}件</dd>
             </dl>
             <dl>
               <dt>商品总价：</dt>
-              <dd>¥{{order.summary.totalPrice}}</dd>
+              <dd>¥{{ order.summary.totalPrice }}</dd>
             </dl>
             <dl>
               <dt>运<i></i>费：</dt>
-              <dd>¥{{order.summary.postFee}}</dd>
+              <dd>¥{{ order.summary.postFee }}</dd>
             </dl>
             <dl>
               <dt>应付总额：</dt>
-              <dd class="price">¥{{order.summary.totalPayPrice}}</dd>
+              <dd class="price">¥{{ order.summary.totalPayPrice }}</dd>
             </dl>
           </div>
         </div>
         <!-- 提交订单 -->
         <div class="submit">
-          <XtxButton
-            type="primary"
-            @click="submitOrderFn"
-          >提交订单</XtxButton>
+          <XtxButton type="primary" @click="submitOrderFn">提交订单</XtxButton>
         </div>
       </div>
     </div>
@@ -123,10 +92,10 @@
 </template>
 <script>
 import CheckoutAddress from './components/checkout-address.vue'
-import { createOrder, submitOrder } from '@/api/order'
+import { createOrder, findOrderRepurchase, submitOrder } from '@/api/order'
 import { reactive, ref } from 'vue'
 import Message from '@/components/library/Message'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 export default {
   name: 'XtxPayCheckoutPage',
   components: {
@@ -134,10 +103,22 @@ export default {
   },
   setup () {
     const order = ref()
-    createOrder().then(data => {
-      order.value = data.result
-      reqParams.goods = data.result.goods.map(({ skuId, count }) => ({ skuId, count }))
-    })
+    const route = useRoute()
+    if (route.query.orderId) {
+      // 再次购买结算
+      findOrderRepurchase(route.query.orderId).then(data => {
+        order.value = data.result
+        // 设置订单商品数据
+        reqParams.goods = data.result.goods.map(({ skuId, count }) => ({ skuId, count }))
+      })
+    } else {
+      // 购物车结算
+      createOrder().then(data => {
+        order.value = data.result
+        reqParams.goods = data.result.goods.map(({ skuId, count }) => ({ skuId, count }))
+      })
+    }
+
     // 提交订单需要收货地址ID
     const changeAdress = (id) => {
       reqParams.addressId = id
@@ -161,7 +142,7 @@ export default {
       }
       submitOrder(reqParams).then(data => {
         // 提交订单成功
-        Message({ type: 'success', text: '请选择收货地址' })
+        Message({ type: 'success', text: '订单提交成功' })
         router.push(`/member/pay?orderId=${data.result.id}`)
       })
     }

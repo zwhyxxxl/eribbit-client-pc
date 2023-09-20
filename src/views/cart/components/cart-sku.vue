@@ -1,34 +1,14 @@
 <template>
   <div class="cart-sku">
-    <div
-      class="attrs"
-      @click="toggle"
-    >
+    <div class="attrs" @click="toggle">
       <span class="ellipsis">{{attrsText}}</span>
       <i class="iconfont icon-angle-down"></i>
     </div>
-    <div
-      class="layer"
-      v-if="visible"
-      ref="target"
-    >
+    <div class="layer" v-if="visible" ref="target">
 
-      <div
-        class="loading"
-        v-if="loading"
-      ></div>
-      <GoodsSku
-        v-else
-        :goods="goods"
-        :skuId="skuId"
-        @change="changeSku"
-      ></GoodsSku>
-      <XtxButton
-        v-if="goods"
-        size="mini"
-        type="primary"
-        @click="submit"
-      >确认</XtxButton>
+      <div class="loading" v-if="loading"></div>
+      <GoodsSku v-else :goods="goods" :skuId="skuId" @change="changeSku"></GoodsSku>
+      <XtxButton v-if="goods" size="mini" type="primary" @click="submit">确认</XtxButton>
     </div>
   </div>
 </template>
@@ -52,7 +32,7 @@ export default {
       default: ''
     }
   },
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const loading = ref(false)
     const visible = ref(false)
     const goods = ref(null)
@@ -61,7 +41,7 @@ export default {
       loading.value = true
       visible.value = true
       // 获取商品数据
-      getSpecsAndSkus(props.skuId).then(data => {
+      getSpecsAndSkus(props.skuId).then((data) => {
         goods.value = data.result
         loading.value = false
       })
@@ -74,7 +54,9 @@ export default {
     const toggle = () => {
       if (visible.value) {
         close()
-      } else { open() }
+      } else {
+        open()
+      }
     }
     // 点击其他地方关闭
     const target = ref(null)

@@ -1,27 +1,11 @@
 <template>
   <div class="goods-sku">
-    <dl
-      v-for="item in goods.specs"
-      :key="item.id"
-    >
+    <dl v-for="item in goods.specs" :key="item.id">
       <dt>{{item.name}}</dt>
       <dd>
-        <template
-          v-for="val in item.values"
-          :key="val.name"
-        >
-          <img
-            @click="changeSku(val,item)"
-            v-if="val.picture"
-            :src="val.picture"
-            :title="val.name"
-            :class="{selected:val.selected,disabled:val.disabled}"
-          >
-          <span
-            :class="{selected:val.selected,disabled:val.disabled}"
-            @click="changeSku(val,item)"
-            v-else
-          >{{val.name}}</span>
+        <template v-for="val in item.values" :key="val.name">
+          <img v-if="val.picture" @click="changeSku(val,item)" :src="val.picture" :title="val.name" :class="{selected:val.selected,disabled:val.disabled}">
+          <span v-else :class="{selected:val.selected,disabled:val.disabled}" @click="changeSku(val,item)">{{val.name}}</span>
         </template>
       </dd>
     </dl>
@@ -35,19 +19,18 @@ const spliter = '★'
 const getPathMap = (skus) => {
   // 1.得到所有的sku集合 goods.skus
   // 2.从所有的sku集合中筛选出有效的sku
-  const pathMap = {}// 路径字典
-  skus.forEach(sku => {
+  const pathMap = {} // 路径字典
+  skus.forEach((sku) => {
     if (sku.inventory > 0) {
       // 3.根据有效sku使用power-set算法得到子集
       // 计算子集
       // 可选值数组
-      const valueArr = sku.specs.map(val => val.valueName)
+      const valueArr = sku.specs.map((val) => val.valueName)
       // 可选值数组子集
       const valueArrPoweSet = powerSet(valueArr)
       // 4.根据子集往路径字典对象中存储key-value
-
       // 遍历子集 往pathMap中插入数据
-      valueArrPoweSet.forEach(arr => {
+      valueArrPoweSet.forEach((arr) => {
         // 根据arr得到字符串的key约定★为拼接符
         const key = arr.join(spliter)
         if (pathMap[key]) {
@@ -63,8 +46,8 @@ const getPathMap = (skus) => {
 // 得到当前选中规格集合
 const getSelectedValues = (specs) => {
   const arr = []
-  specs.forEach(item => {
-    const selectedVal = item.values.find(val => val.selected)
+  specs.forEach((item) => {
+    const selectedVal = item.values.find((val) => val.selected)
     arr.push(selectedVal ? selectedVal.name : undefined)
   })
   return arr
@@ -74,13 +57,13 @@ const updateDisabledStatus = (specs, pathMap) => {
   // 约定每个按钮的禁用状态由它本身的disabled数据控制
   specs.forEach((item, i) => {
     const selectedValues = getSelectedValues(specs)
-    item.values.forEach(val => {
+    item.values.forEach((val) => {
       // 判断当前是否选中，选中不用判断，
       if (val.selected) return
       // 未选中：拿着当前的值按照索引位置套入选中的值数据
       selectedValues[i] = val.name
       // 提出undefined数据 用★拼接成一个key
-      const key = selectedValues.filter(values => values).join(spliter)
+      const key = selectedValues.filter((values) => values).join(spliter)
       // 拿着key去路径字典中查找数据
       // 有可以点击，没有就禁用
       val.disabled = !pathMap[key]
@@ -90,9 +73,9 @@ const updateDisabledStatus = (specs, pathMap) => {
 // 默认选中方法
 const initDefaultSelected = (goods, skuId) => {
   // 找出sku的信息
-  const sku = goods.skus.find(sku => sku.id === skuId)
+  const sku = goods.skus.find((sku) => sku.id === skuId)
   goods.specs.forEach((item, i) => {
-    const val = item.values.find(val => val.name === sku.specs[i].valueName)
+    const val = item.values.find((val) => val.name === sku.specs[i].valueName)
     val.selected = true
   })
   // 遍历每个按钮 按钮的值和sku记录的值相同就选中
@@ -102,7 +85,7 @@ export default {
   props: {
     goods: {
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     skuId: {
       type: String,
@@ -110,9 +93,11 @@ export default {
     }
   },
 
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     // 组件初始化是根据传入的skuId初始化选中状态
-    if (props.skuId) { initDefaultSelected(props.goods, props.skuId) }
+    if (props.skuId) {
+      initDefaultSelected(props.goods, props.skuId)
+    }
 
     const pathMap = getPathMap(props.goods.skus)
 
@@ -128,7 +113,7 @@ export default {
       if (val.selected) {
         val.selected = !val.selected
       } else {
-        item.values.forEach(valItem => {
+        item.values.forEach((valItem) => {
           valItem.selected = false
         })
         val.selected = !val.selected
@@ -139,17 +124,17 @@ export default {
       // 把选择的sku信息通知父组件
       // 选择完整的sku组合按钮，才可以拿到这些信息，提交父组件
       // 不是完整的sku组合按钮，提交空对象给父组件
-      const validSelectedValues = getSelectedValues(props.goods.specs).filter(v => v)
+      const validSelectedValues = getSelectedValues(props.goods.specs).filter((v) => v)
       if (validSelectedValues.length === props.goods.specs.length) {
         const skuIds = pathMap[validSelectedValues.join(spliter)]
 
-        const sku = props.goods.skus.find(sku => sku.id === skuIds[0])
+        const sku = props.goods.skus.find((sku) => sku.id === skuIds[0])
         emit('change', {
           skuId: sku.id,
           price: sku.price,
           oldPrice: sku.oldPrice,
           inventory: sku.inventory,
-          specsText: sku.specs.reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '').replace(' ', '')// 属性名：属性值...这样的字符串 颜色：黑色 产地：日本
+          specsText: sku.specs.reduce((p, n) => `${p} ${n.name}：${n.valueName}`, '').replace(' ', '') // 属性名：属性值...这样的字符串 颜色：黑色 产地：日本
         })
       } else {
         // 加入购物车时父组件需要判断规格是否选择完

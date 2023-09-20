@@ -1,62 +1,41 @@
 <template>
-  <HomePanel
-    title="热门品牌"
-    sub-title="国际经典 品质保证"
-  >
+  <HomePanel title="热门品牌" sub-title="国际经典 品质保证">
     <template v-slot:right>
       <a
         href="javascript:;"
         class="iconfont icon-angle-left prev"
-        :class="{disabled:index===0}"
+        :class="{ disabled: index === 0 }"
         @click="toggle(-1)"
       ></a>
       <a
         href="javascript:;"
         class="iconfont icon-angle-right next"
-        :class="{disabled:index===1}"
+        :class="{ disabled: index === 1 }"
         @click="toggle(1)"
       ></a>
     </template>
-    <div
-      class="box"
-      ref="target"
-    >
-      <Transition name='fade'>
-        <ul
-          class="list"
-          :style="`transform:translateX(${-index*1240}px)`"
-          v-if="brands.length"
-        >
-          <li
-            v-for="item in brands"
-            :key="item.id"
-          >
+    <div class="box" ref="target">
+      <Transition name="fade">
+        <ul class="list" :style="`transform:translateX(${-index * 1240}px)`" v-if="brands.length">
+          <li v-for="item in brands" :key="item.id">
             <RouterLink to="/">
-              <img
-                :src="item.picture"
-                alt=""
-              >
+              <img :src="item.picture" alt="" />
             </RouterLink>
           </li>
         </ul>
-        <div
-          v-else
-          class="skeleton"
-        >
+        <div v-else class="skeleton">
           <xtx-skeleton
             class="item"
             v-for="i in 5"
-            :key='i'
+            :key="i"
             animated
             bg="#e4e4e4"
-            width='240px'
-            height='305px'
+            width="240px"
+            height="305px"
           ></xtx-skeleton>
         </div>
       </Transition>
-
     </div>
-
   </HomePanel>
 </template>
 
@@ -69,7 +48,7 @@ import { useLazyData } from '@/hooks'
 export default {
   name: 'HomeBrand',
   components: { HomePanel, XtxSkeleton },
-  setup () {
+  setup() {
     // 获取数据
     // const brands = ref([])
     // findBrand(10).then((data) => {
@@ -91,7 +70,7 @@ export default {
 }
 </script>
 
-<style scoped lang='less'>
+<style scoped lang="less">
 .skeleton {
   width: 100%;
   display: flex;

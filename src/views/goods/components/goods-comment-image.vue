@@ -3,29 +3,17 @@
     <div class="list">
       <a
         href="javascript:;"
-        :class="{active:currImage===url}"
-        @click="currImage=url"
+        :class="{ active: currImage === url }"
+        @click="currImage = url"
         v-for="url in pictures"
         :key="url"
       >
-        <img
-          :src="url"
-          alt=""
-        >
+        <img :src="url" alt="" />
       </a>
     </div>
-    <div
-      class="preview"
-      v-if="currImage"
-    >
-      <img
-        :src="currImage"
-        alt=""
-      >
-      <i
-        @click="currImage=null"
-        class="iconfont icon-close-new"
-      ></i>
+    <div class="preview" v-if="currImage">
+      <img :src="currImage" alt="" />
+      <i @click="currImage = null" class="iconfont icon-close-new"></i>
     </div>
   </div>
 </template>

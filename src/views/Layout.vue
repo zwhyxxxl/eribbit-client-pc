@@ -28,7 +28,7 @@ export default {
     AppHeaderStick
   },
   // 获取分类数据
-  setup () {
+  setup() {
     const store = useStore()
     store.dispatch('category/getList')
   }
@@ -39,4 +39,5 @@ export default {
 .app-body {
   min-height: 600px;
 }
-</style>>
+</style>
+>
