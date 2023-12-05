@@ -17,6 +17,7 @@ const MemberLayout = () => import('@/views/member/Layout')
 const MemberHome = () => import('@/views/member/home')
 const MemberOrder = () => import('@/views/member/order')
 const MemberOrderDetail = () => import('@/views/member/order/detail')
+
 const routes = [
   // 一级路由布局容器
   {

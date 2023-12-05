@@ -1,24 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <div class="container">
-      <img class="img" src="./src/assets/images/loading.gif" alt="" />
-      <img class="img" src="./src/assets/images/loading.gif" alt="" />
-      <img class="img" src="./src/assets/images/loading.gif" alt="" />
-      aaaaaaaaaaaaa
-    </div>
-  </body>
-  <style>
-    .container {
-      display: flex;
-      width: 100px;
-      overflow-x: scroll;
-      white-space: nowrap;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const gridSize = 20;
+            const snake = [{ x: 0, y: 0 }];
+            const food = { x: 0, y: 0 };
+
+            let direction = 'right';
+
+            function draw() {
+                // 清空画布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 画蛇
+                ctx.fillStyle = '#00F';
+                snake.forEach(segment => {
+                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+                });
+
+                // 画食物
+                ctx.fillStyle = '#F00';
+                ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+            }
+
+            function update() {
+                // 移动蛇头
+                let newHead = { ...snake[0] };
+                switch (direction) {
+                    case 'up':
+                        newHead.y -= 1;
+                        break;
+                    case 'down':
+                        newHead.y += 1;
+                        break;
+                    case 'left':
+                        newHead.x -= 1;
+                        break;
+                    case 'right':
+                        newHead.x += 1;
+                        break;
+                }
+
+                // 检查是否吃到食物
+                if (newHead.x === food.x && newHead.y === food.y) {
+                    // 生成新的食物
+                    food.x = Math.floor(Math.random() * (canvas.width / gridSize));
+                    food.y = Math.floor(Math.random() * (canvas.height / gridSize));
+
+                    // 将新的头部插入到蛇的开头
+                    snake.unshift(newHead);
+                } else {
+                    // 移除蛇尾
+                    snake.pop();
+                    // 将新的头部插入到蛇的开头
+                    snake.unshift(newHead);
+                }
+
+                // 检查是否碰到边界
+                if (newHead.x < 0 || newHead.x >= canvas.width / gridSize || newHead.y < 0 || newHead.y >= canvas.height / gridSize) {
+                    alert('游戏结束！');
+                    resetGame();
+                }
+
+                // 检查是否碰到自己
+                for (let i = 1; i < snake.length; i++) {
+                    if (newHead.x === snake[i].x && newHead.y === snake[i].y) {
+                        alert('游戏结束！');
+                        resetGame();
+                    }
+                }
+            }
+
+function resetGame() {
+    snake.length = 1;
+    snake[0] = { x: 0, y: 0 };
+    food.x = Math.floor(Math.random() * (canvas.width / gridSize));
+    food.y = Math.floor(Math.random() * (canvas.height / gridSize));
+    direction = 'right'; // 设置初始方向
+}
+
+let lastUpdateTime = 0;
+const updateTime = 100; // 时间间隔（毫秒）
+
+function gameLoop(timestamp) {
+    if (timestamp - lastUpdateTime < updateTime) {
+        requestAnimationFrame(gameLoop);
+        return;
     }
-  </style>
+
+    draw();
+    update();
+    lastUpdateTime = timestamp;
+
+    requestAnimationFrame(gameLoop);
+}
+
+            document.addEventListener('keydown', (event) => {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        if (direction !== 'down') direction = 'up';
+                        break;
+                    case 'ArrowDown':
+                        if (direction !== 'up') direction = 'down';
+                        break;
+                    case 'ArrowLeft':
+                        if (direction !== 'right') direction = 'left';
+                        break;
+                    case 'ArrowRight':
+                        if (direction !== 'left') direction = 'right';
+                        break;
+                }
+            });
+
+            resetGame();
+            gameLoop();
+        });
+    </script>
+</body>
 </html>

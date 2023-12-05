@@ -10,11 +10,7 @@
           <thead>
             <tr>
               <th width="120">
-                <XtxCheckbox
-                  @change="checkAll"
-                  :modelValue="$store.getters['cart/isCheckAll']"
-                  >全选</XtxCheckbox
-                >
+                <XtxCheckbox @change="checkAll" :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
               </th>
               <th width="400">商品信息</th>
               <th width="220">单价</th>
@@ -30,30 +26,18 @@
             </td>
           </tr>
           <tbody>
-            <tr
-              v-for="goods in $store.getters['cart/validList']"
-              :key="goods.skuId"
-            >
+            <tr v-for="goods in $store.getters['cart/validList']" :key="goods.skuId">
               <td>
-                <XtxCheckbox
-                  :modelValue="goods.selected"
-                  @change="($event) => checkOne(goods.skuId, $event)"
-                />
+                <XtxCheckbox :modelValue="goods.selected" @change="($event) => checkOne(goods.skuId, $event)" />
               </td>
               <td>
                 <div class="goods">
-                  <RouterLink :to="`/product/${goods.id}`"
-                    ><img :src="goods.picture" alt=""
-                  /></RouterLink>
+                  <RouterLink :to="`/product/${goods.id}`"><img :src="goods.picture" alt="" /></RouterLink>
                   <div>
                     <p class="name ellipsis">{{ goods.name }}</p>
                     <!-- 选择规格组件 -->
                     <!-- <p class="attr">{{goods.attrsText}}</p> -->
-                    <CartSku
-                      @change="($event) => updateCartSku(goods.skuId, $event)"
-                      :skuId="goods.skuId"
-                      :attrsText="goods.attrsText"
-                    ></CartSku>
+                    <CartSku @change="($event) => updateCartSku(goods.skuId, $event)" :skuId="goods.skuId" :attrsText="goods.attrsText"></CartSku>
                   </div>
                 </div>
               </td>
@@ -61,17 +45,11 @@
                 <p>&yen;{{ goods.nowPrice }}</p>
                 <p v-if="goods.price - goods.nowPrice > 0">
                   比加入时降价
-                  <span class="red"
-                    >&yen;{{ goods.price - goods.nowPrice }}</span
-                  >
+                  <span class="red">&yen;{{ goods.price - goods.nowPrice }}</span>
                 </p>
               </td>
               <td class="tc">
-                <XtxNumbox
-                  @change="($event) => changeCount(goods.skuId, $event)"
-                  :max="goods.stock"
-                  :modelValue="goods.count"
-                />
+                <XtxNumbox @change="($event) => changeCount(goods.skuId, $event)" :max="goods.stock" :modelValue="goods.count" />
               </td>
               <td class="tc">
                 <p class="f16 red">
@@ -81,12 +59,7 @@
               <td class="tc">
                 <p><a href="javascript:;">移入收藏夹</a></p>
                 <p>
-                  <a
-                    class="green"
-                    href="javascript:;"
-                    @click="deleteCart(goods.skuId)"
-                    >删除</a
-                  >
+                  <a class="green" href="javascript:;" @click="deleteCart(goods.skuId)">删除</a>
                 </p>
                 <p><a href="javascript:;">找相似</a></p>
               </td>
@@ -99,10 +72,7 @@
                 <h3 class="tit">失效商品</h3>
               </td>
             </tr>
-            <tr
-              v-for="item in $store.getters['cart/validList']"
-              :key="item.skuId"
-            >
+            <tr v-for="item in $store.getters['cart/validList']" :key="item.skuId">
               <td>
                 <XtxCheckbox style="color: #eee" />
               </td>
@@ -136,11 +106,7 @@
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          <XtxCheckbox
-            @change="checkAll"
-            :modelValue="$store.getters['cart/isCheckAll']"
-            >全选</XtxCheckbox
-          >
+          <XtxCheckbox @change="checkAll" :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
           <a href="javascript:;" @click="batchDeleteCart(false)">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
           <a href="javascript:;" @click="batchDeleteCart(true)">清空失效商品</a>
@@ -148,9 +114,7 @@
         <div class="total">
           共 {{ $store.getters['cart/validTotal'] }} 件商品，已选择
           {{ $store.getters['cart/selectedTotal'] }} 件，商品合计：
-          <span class="red"
-            >¥{{ $store.getters['cart/selectedAmount'].toFixed(2) }}</span
-          >
+          <span class="red">¥{{ $store.getters['cart/selectedAmount'].toFixed(2) }}</span>
           <XtxButton type="primary" @click="goCheckout">下单结算</XtxButton>
         </div>
       </div>
@@ -170,7 +134,7 @@ import Message from '@/components/library/Message'
 export default {
   name: 'XtxCartPage',
   components: { GoodRelevant, CartNone, CartSku },
-  setup () {
+  setup() {
     const store = useStore()
     // 单选
     const checkOne = (skuId, selected) => {
@@ -183,19 +147,22 @@ export default {
     }
     // 删除
     const deleteCart = (skuId) => {
-      Confirm({ text: '是否确认删除商品' }).then(() => {
-        console.log('点了确认')
-        store.dispatch('cart/deleteCart', skuId)
-      }).catch(e => {
-        console.log('点了取消')
-      })
+      Confirm({ text: '是否确认删除商品' })
+        .then(() => {
+          console.log('点了确认')
+          store.dispatch('cart/deleteCart', skuId)
+        })
+        .catch((e) => {
+          console.log('点了取消')
+        })
     }
     // 批量删除 也支持清空无效商品
     const batchDeleteCart = (isClear) => {
-      Confirm({ text: `您确定从购物车中删除${isClear ? '失效' : '选中'}的商品吗？` }).then(() => {
-        store.dispatch('cart/batchDeleteCart', isClear)
-      }).catch(e => {
-      })
+      Confirm({ text: `您确定从购物车中删除${isClear ? '失效' : '选中'}的商品吗？` })
+        .then(() => {
+          store.dispatch('cart/batchDeleteCart', isClear)
+        })
+        .catch((e) => {})
     }
     // 改变商品数量
     const changeCount = (skuId, count) => {
@@ -216,10 +183,12 @@ export default {
         router.push('/member/checkout')
       } else {
         // 未登录
-        Confirm({ text: '下单结算需要登录，您是否去登录？' }).then(() => {
-          // 点击确认
-          router.push('/member/checkout')
-        }).catch(e => { })
+        Confirm({ text: '下单结算需要登录，您是否去登录？' })
+          .then(() => {
+            // 点击确认
+            router.push('/member/checkout')
+          })
+          .catch((e) => {})
       }
     }
     return { checkOne, checkAll, deleteCart, batchDeleteCart, changeCount, updateCartSku, goCheckout }
@@ -229,37 +198,46 @@ export default {
 <style scoped lang="less">
 .tc {
   text-align: center;
+
   .xtx-numbox {
     margin: 0 auto;
     width: 120px;
   }
 }
+
 .red {
   color: @priceColor;
 }
+
 .green {
   color: @xtxColor;
 }
+
 .f16 {
   font-size: 16px;
 }
+
 .goods {
   display: flex;
   align-items: center;
+
   img {
     width: 100px;
     height: 100px;
   }
-  > div {
+
+  >div {
     width: 280px;
     font-size: 16px;
     padding-left: 10px;
+
     .attr {
       font-size: 14px;
       color: #999;
     }
   }
 }
+
 .action {
   display: flex;
   background: #fff;
@@ -269,44 +247,53 @@ export default {
   font-size: 16px;
   justify-content: space-between;
   padding: 0 30px;
+
   .xtx-checkbox {
     color: #999;
   }
+
   .batch {
     a {
       margin-left: 20px;
     }
   }
+
   .red {
     font-size: 18px;
     margin-right: 20px;
     font-weight: bold;
   }
 }
+
 .tit {
   color: #666;
   font-size: 16px;
   font-weight: normal;
   line-height: 50px;
 }
+
 .xtx-cart-page {
   .cart {
     background: #fff;
     color: #666;
+
     table {
       border-spacing: 0;
       border-collapse: collapse;
       line-height: 24px;
+
       th,
       td {
         padding: 10px;
         border-bottom: 1px solid #f5f5f5;
+
         &:first-child {
           text-align: left;
           padding-left: 30px;
           color: #999;
         }
       }
+
       th {
         font-size: 16px;
         font-weight: normal;
@@ -314,5 +301,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

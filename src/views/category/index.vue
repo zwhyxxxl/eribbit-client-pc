@@ -4,30 +4,17 @@
       <!-- 面包屑 -->
       <XtxBread>
         <XtxBreadItem to="/">首页</XtxBreadItem>
-        <Transition
-          name="fade-right"
-          mode="out-in"
-        >
-          <XtxBreadItem
-            v-if="topCategory"
-            :key='topCategory.id'
-          >{{topCategory.name}}</XtxBreadItem>
+        <Transition name="fade-right" mode="out-in">
+          <XtxBreadItem v-if="topCategory" :key='topCategory.id'>{{topCategory.name}}</XtxBreadItem>
         </Transition>
       </XtxBread>
       <!-- 轮播图 -->
-      <XtxCarousel
-        :autoPlay='true'
-        :sliders="sliders"
-        style="height:500px"
-      />
+      <XtxCarousel :autoPlay='true' :sliders="sliders" style="height:500px" />
       <!-- 所有二级分类 -->
       <div class="sub-list">
         <h3>全部分类</h3>
         <ul>
-          <li
-            v-for="sub in topCategory.children"
-            :key="sub.id"
-          >
+          <li v-for="sub in topCategory.children" :key="sub.id">
             <router-link :to="`/category/sub/${sub.id}`">
               <img :src="sub.picture">
               <p>{{sub.name}}</p>
@@ -36,22 +23,14 @@
         </ul>
       </div>
       <!-- 不同分类商品 -->
-      <div
-        class="ref-goods"
-        v-for="sub in subList"
-        :key='sub.id'
-      >
+      <div class="ref-goods" v-for="sub in subList" :key='sub.id'>
         <div class="head">
           <h3>- {{sub.name}} -</h3>
           <p class="tag">南水北调</p>
           <XtxMore :path='`/category/sub/${sub.id}`' />
         </div>
         <div class="body">
-          <GoodsItem
-            v-for="goods in sub.goods"
-            :key="goods.id"
-            :goods='goods'
-          />
+          <GoodsItem v-for="goods in sub.goods" :key="goods.id" :goods='goods' />
         </div>
       </div>
     </div>
@@ -69,10 +48,10 @@ export default {
   components: {
     GoodsItem
   },
-  setup () {
+  setup() {
     // 轮播图
     const sliders = ref([])
-    findBanner().then(data => {
+    findBanner().then((data) => {
       sliders.value = data.result
     })
     // 面包屑+所有子分类 ===>vuex
@@ -83,7 +62,7 @@ export default {
       // console.log(route.params.id)
       // console.log(store.state.category.list)
       let cate = {}
-      const item = store.state.category.list.find(item => {
+      const item = store.state.category.list.find((item) => {
         return item.id === route.params.id
       })
       if (item) cate = item
@@ -92,13 +71,17 @@ export default {
     // 获取各个类目下的推荐商品
     const subList = ref([])
     const getSubList = () => {
-      findTopCategory(route.params.id).then(data => {
+      findTopCategory(route.params.id).then((data) => {
         subList.value = data.result.children
       })
     }
-    watch(() => route.params.id, (newVal) => {
-      if (newVal && `/category/${newVal}` === route.path) getSubList()
-    }, { immediate: true })
+    watch(
+      () => route.params.id,
+      (newVal) => {
+        if (newVal && `/category/${newVal}` === route.path) getSubList()
+      },
+      { immediate: true }
+    )
 
     return { sliders, topCategory, subList }
   }

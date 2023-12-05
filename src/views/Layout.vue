@@ -12,7 +12,6 @@
   <!-- 底部组件 -->
   <AppFooter></AppFooter>
 </template>
-
 <script>
 import AppNavbar from '@/components/app-navbar.vue'
 import AppHeader from '@/components/app-header.vue'
@@ -34,10 +33,8 @@ export default {
   }
 }
 </script>
-
 <style lang="less" scoped>
 .app-body {
   min-height: 600px;
 }
 </style>
->
